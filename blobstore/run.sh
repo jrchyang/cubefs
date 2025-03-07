@@ -23,6 +23,12 @@ if [ "${consul}" == "--consul" ]; then
 fi
 
 # start kafka
+if [ "$CPU_ARCH" == "arm" ];then
+  # patch java options
+  sed -i 's/  nohup "\$JAVA"/  nohup "\$JAVA" -XX:+UnlockExperimentalVMOptions/' bin/blobstore/kafka_2.13-3.1.0/bin/kafka-run-class.sh
+  sed -i 's/  exec "\$JAVA"/  exec "\$JAVA" -XX:+UnlockExperimentalVMOptions/' bin/blobstore/kafka_2.13-3.1.0/bin/kafka-run-class.sh
+  chmod +x bin/blobstore/kafka_2.13-3.1.0/bin/kafka-run-class.sh
+fi
 uuid=`./bin/blobstore/kafka_2.13-3.1.0/bin/kafka-storage.sh random-uuid`
 ./bin/blobstore/kafka_2.13-3.1.0/bin/kafka-storage.sh format -t $uuid -c bin/blobstore/kafka_2.13-3.1.0/config/kraft/server.properties
 ./bin/blobstore/kafka_2.13-3.1.0/bin/kafka-server-start.sh -daemon bin/blobstore/kafka_2.13-3.1.0/config/kraft/server.properties

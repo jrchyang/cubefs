@@ -3,10 +3,13 @@
 .vscode
 blobstore/.deps/
 blobstore/bin/
+blobstore/run/
 build/bin
 build/include/
 build/lib/
 build/out/
+build/run/
+build/blobnode.flock
 docker/bin
 docker/docker_data
 docker/log
