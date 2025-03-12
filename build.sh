@@ -2,6 +2,7 @@
 
 RootPath=$(cd $(dirname $0); pwd)
 module=$1
+[ -z "$module" ] && module=all
 
 build_linux_x86_64() {
      make "$module"
@@ -48,38 +49,38 @@ get_rocksdb_compress_dep() {
 
     if [ ! -d "${RootPath}/vendor/dep/zlib-1.2.11" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
-            cp /home/cubefs-deps/zlib-1.2.11.tar.gz ./
+            cp "$OFFLINE_BUILD/zlib-1.2.11.tar.gz" ./
         else
             wget https://zlib.net/fossils/zlib-1.2.11.tar.gz
         fi
-        tar zxf zlib-1.2.11.tar.gz
+        tar -zxf zlib-1.2.11.tar.gz
     fi
 
     if [ ! -d "${RootPath}/vendor/dep/bzip2-1.0.6" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
-            cp /home/cubefs-deps/bzip2-1.0.6.tar.gz ./
+            cp "$OFFLINE_BUILD/bzip2-1.0.6.tar.gz" ./
         else
-            wget https://sourceforge.net/projects/bzip2/files/bzip2-1.0.6.tar.gz
+            wget https://repository.timesys.com/buildsources/b/bzip2/bzip2-1.0.6/bzip2-1.0.6.tar.gz
         fi
-        tar zxf bzip2-1.0.6.tar.gz
+        tar -zxf bzip2-1.0.6.tar.gz
     fi
 
     if [ ! -d "${RootPath}/vendor/dep/zstd-1.4.8" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
-            cp /home/cubefs-deps/zstd-v1.4.8.zip ./
+            cp "$OFFLINE_BUILD/zstd-v1.4.8.zip" ./
         else
             wget -O zstd-v1.4.8.zip https://codeload.github.com/facebook/zstd/zip/v1.4.8
         fi
-        unzip zstd-v1.4.8.zip
+        unzip -q zstd-v1.4.8.zip
     fi
 
     if [ ! -d "${RootPath}/vendor/dep/lz4-1.9.3" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
-            cp /home/cubefs-deps/lz4-v1.9.3.tar.gz ./
+            cp "$OFFLINE_BUILD/lz4-v1.9.3.tar.gz" ./
         else
             wget -O lz4-v1.9.3.tar.gz https://codeload.github.com/lz4/lz4/tar.gz/v1.9.3
         fi
-        tar zxf lz4-v1.9.3.tar.gz
+        tar -zxf lz4-v1.9.3.tar.gz
     fi
 
     #rm -rf zlib-1.2.11.tar.gz bzip2-1.0.6.tar.gz v1.4.8 v1.9.3

@@ -3,8 +3,9 @@
 consul=$1
 source ./init.sh
 
+cpu_arch=$(check_cpu_architecture)
 # build blobstore and get consul kafka
-INIT
+INIT "$OFFLINE_RUN"
 
 if [ ! -d ./blobstore/run/logs ];then
   mkdir -p ./blobstore/run/logs
@@ -23,7 +24,7 @@ if [ "${consul}" == "--consul" ]; then
 fi
 
 # start kafka
-if [ "$CPU_ARCH" == "arm" ];then
+if [ "$cpu_arch" == "arm" ];then
   # patch java options
   sed -i 's/  nohup "\$JAVA"/  nohup "\$JAVA" -XX:+UnlockExperimentalVMOptions/' bin/blobstore/kafka_2.13-3.1.0/bin/kafka-run-class.sh
   sed -i 's/  exec "\$JAVA"/  exec "\$JAVA" -XX:+UnlockExperimentalVMOptions/' bin/blobstore/kafka_2.13-3.1.0/bin/kafka-run-class.sh
