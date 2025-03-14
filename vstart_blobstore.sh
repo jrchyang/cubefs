@@ -44,12 +44,12 @@ function setup_dependences()
     fi
 }
 
-TAR_DIR="/home/blobstore-deps"
-BIN_DIR="/usr/bin"
-DEP_DIR="/usr/bin/blobstore"
-RUN_DIR="/var/run/blobstore"
-LOG_DIR="/var/log/blobstore"
-CONF_DIR="$script_dir/../config"
+TAR_DIR="${TAR_DIR:-/home/blobstore-deps}"
+BIN_DIR="${BIN_DIR:-/usr/bin}"
+DEP_DIR="${DEP_DIR:-/usr/bin/blobstore}"
+RUN_DIR="${RUN_DIR:-/var/run/blobstore}"
+LOG_DIR="${LOG_DIR:-/var/log/blobstore}"
+CONF_DIR="${CONF_DIR:-$script_dir/../config}"
 cpu_arch=$(get_cpu_architecture)
 consul=$1
 
