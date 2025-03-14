@@ -95,6 +95,24 @@ get_rocksdb_compress_dep() {
     cd "${root_path}"
 }
 
+copy_config() {
+    if [ -d "${root_path}/build/conf" ];then
+        mkdir -p "${root_path}/build/conf"
+    fi
+
+    cp -f blobstore/cmd/clustermgr/clustermgr.conf "${root_path}"/build/conf/clustermgr.conf
+    cp -f blobstore/cmd/clustermgr/clustermgr1.conf "${root_path}"/build/conf/clustermgr1.conf
+    cp -f blobstore/cmd/clustermgr/clustermgr2.conf "${root_path}"/build/conf/clustermgr2.conf
+    cp -f blobstore/cmd/clustermgr/clustermgr3.conf "${root_path}"/build/conf/clustermgr3.conf
+    cp -f blobstore/cmd/proxy/proxy.conf "${root_path}"/build/conf/proxy.conf
+    cp -f blobstore/cmd/scheduler/scheduler.conf "${root_path}"/build/conf/scheduler.conf
+    cp -f blobstore/cmd/scheduler/scheduler.leader.conf "${root_path}"/build/conf/scheduler.leader.conf
+    cp -f blobstore/cmd/scheduler/scheduler.follower.conf "${root_path}"/build/conf/scheduler.follower.conf
+    cp -f blobstore/cmd/blobnode/blobnode.conf "${root_path}"/build/conf/blobnode.conf
+    cp -f blobstore/cmd/access/access.conf "${root_path}"/build/conf/access.conf
+    cp -f blobstore/cli/cli/cli.conf "${root_path}"/build/conf/blobstore.cli.conf
+}
+
 # build rpm blobstore
 build_rpm_blobstore() {
     echo "building blobstore rpm"
@@ -171,20 +189,18 @@ done
 if [ -n "$rpm_target" ];then
     build_rpm
 else
-    case "$cpu_arch" in
-        "x86")
-            build_linux_x86_64
-            ;;
-        "arm")
-            if [ $((gcc_version + 0)) -ge 9 ];then
-                build_linux_arm64_gcc9
-            else
-                build_linux_arm64_gcc4
-            fi
-            ;;
-        "unknown")
-            echo "unknown cpu architecture"
-            exit 1
-            ;;
-    esac
+    if [ "$cpu_arch" == "x86" ];then
+        build_linux_x86_64
+    elif [ "$cpu_arch" == "arm" ];then
+        if [ $((gcc_version + 0)) -ge 9 ];then
+            build_linux_arm64_gcc9
+        else
+            build_linux_arm64_gcc4
+        fi
+    else
+        echo "unknown cpu architecture"
+        exit 1
+    fi
+
+    copy_config
 fi
