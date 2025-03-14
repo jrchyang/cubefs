@@ -1,8 +1,15 @@
 #!/bin/bash
 
-RootPath=$(cd $(dirname $0); pwd)
-module=$1
-[ -z "$module" ] && module=all
+set -e
+
+root_path=$(readlink -f "$0")
+source "$root_path/check_env.sh"
+
+echo_error() {
+    local msg="$1"
+    echo "$msg" >&2
+    exit 1
+}
 
 build_linux_x86_64() {
      make "$module"
@@ -42,12 +49,12 @@ get_rocksdb_compress_dep() {
    #################################################################
    ## Might check the dep files each in individual if wget failed ##
    #################################################################
-    if [ ! -d "${RootPath}/vendor/dep" ]; then
-        mkdir -p ${RootPath}/vendor/dep
+    if [ ! -d "${root_path}/vendor/dep" ]; then
+        mkdir -p "${root_path}/vendor/dep"
     fi
-    cd ${RootPath}/vendor/dep
+    cd "${root_path}/vendor/dep"
 
-    if [ ! -d "${RootPath}/vendor/dep/zlib-1.2.11" ]; then
+    if [ ! -d "${root_path}/vendor/dep/zlib-1.2.11" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
             cp "$OFFLINE_BUILD/zlib-1.2.11.tar.gz" ./
         else
@@ -56,7 +63,7 @@ get_rocksdb_compress_dep() {
         tar -zxf zlib-1.2.11.tar.gz
     fi
 
-    if [ ! -d "${RootPath}/vendor/dep/bzip2-1.0.6" ]; then
+    if [ ! -d "${root_path}/vendor/dep/bzip2-1.0.6" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
             cp "$OFFLINE_BUILD/bzip2-1.0.6.tar.gz" ./
         else
@@ -65,7 +72,7 @@ get_rocksdb_compress_dep() {
         tar -zxf bzip2-1.0.6.tar.gz
     fi
 
-    if [ ! -d "${RootPath}/vendor/dep/zstd-1.4.8" ]; then
+    if [ ! -d "${root_path}/vendor/dep/zstd-1.4.8" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
             cp "$OFFLINE_BUILD/zstd-v1.4.8.zip" ./
         else
@@ -74,7 +81,7 @@ get_rocksdb_compress_dep() {
         unzip -q zstd-v1.4.8.zip
     fi
 
-    if [ ! -d "${RootPath}/vendor/dep/lz4-1.9.3" ]; then
+    if [ ! -d "${root_path}/vendor/dep/lz4-1.9.3" ]; then
         if [ -n "$OFFLINE_BUILD" ];then
             cp "$OFFLINE_BUILD/lz4-v1.9.3.tar.gz" ./
         else
@@ -84,22 +91,93 @@ get_rocksdb_compress_dep() {
     fi
 
     #rm -rf zlib-1.2.11.tar.gz bzip2-1.0.6.tar.gz v1.4.8 v1.9.3
-    cd ${RootPath}
+    cd "${root_path}"
 }
 
-CPUTYPE=${CPUTYPE} | tr 'A-Z' 'a-z'
-echo ${CPUTYPE}
-case ${CPUTYPE} in
-    "arm64_gcc9")
-        build_linux_arm64_gcc9
-        ;;
-    "arm64_gcc4")
-        build_linux_arm64_gcc4
-        ;;
-    "arm64")
-        build_linux_arm64_gcc4
-        ;;
-    *)
+# build rpm blobstore
+build_rpm_blobstore() {
+    echo "building blobstore rpm"
+
+    # 获取版本号等信息
+    rpm_version=$(git describe --tags --abbrev=0)
+    rpm_rversion=$(git log -n1 --format=%h)
+    rpm_dirname=$(basename "$root_path")
+    rpm_name="blobstore"
+    rpm_target="$rpm_name-$rpm_version-$rpm_rversion"
+
+    # 生成 rpm 编译使用的代码
+    cp -rp ../"$rpm_dirname" ~/rpmbuild/SOURCES/"$rpm_target"
+    cd ~/rpmbuild/SOURCES && tar -zcf "$rpm_target".tar.bz2 "$rpm_target"
+    rm -rf ~/rpmbuild/SOURCES/"$rpm_target"
+    sed -e "s,@name@,${rpm_name},g" \
+        -e "s,@version@,${rpm_version},g" \
+        -e "s,@revision@,${rpm_rversion},g" \
+        "$root_path"/redundancer.spec.in > ~/rpmbuild/SPECS/${rpm_name}.spec
+
+    # 构建 RPM 包
+    rpmbuild -bb --clean ~/rpmbuild/SPECS/${rpm_name}.spec
+
+    cd "${root_path}"
+}
+
+# build rpm
+build_rpm() {
+    if [ "$rpm_target" == "blobstore" ];then
+        build_rpm_blobstore
+    fi
+}
+
+cpu_arch=$(get_cpu_architecture)
+gcc_version=$(get_gcc_version)
+module="all"
+rpm_target=""
+
+if ! GETOPT_ARGS=$(getopt -q -o r:m: --long rpm:module: -- "$@");then
+    echo_error "Error: Invalid option."
+fi
+eval set -- "$GETOPT_ARGS"
+
+# 获取参数
+while [ -n "$1" ]; do
+    case "$1" in
+        -r|--rpm)
+            [ -z "$2" ] && echo_error "Error: -m requires a value."
+            rpm_target="$2"
+            shift
+            ;;
+        -m|--module)
+            [ -z "$2" ] && echo_error "Error: -m requires a value."
+            module="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "unimplemented option"
+            exit 1
+            ;;
+    esac
+done
+
+case "$cpu_arch" in
+    "x86")
         build_linux_x86_64
         ;;
+    "arm")
+        if [ $((gcc_version + 0)) -ge 9 ];then
+            build_linux_arm64_gcc9
+        else
+            build_linux_arm64_gcc4
+        fi
+        ;;
+    "unknown")
+        echo "unknown cpu architecture"
+        exit 1
+        ;;
 esac
+
+if [ -n "$rpm_target" ];then
+    build_rpm
+fi

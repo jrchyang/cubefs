@@ -1,0 +1,87 @@
+%define __name  @name@
+%define __ver   @version@
+%define __rev   @revision@
+
+Name: %{__name}
+Version: %{__ver}
+Release: %{__rev}
+
+Summary: Built Based-on %{__rev}
+License: Apache
+Group: System Daemons
+URL: https://github.com/cubefs/cubefs
+Source0: %{name}-%{version}-%{release}.tar.bz2
+
+# Disable the building of the debug package
+%define debug_package %{nil}
+
+BuildRequires: gcc-c++ >= 4.8.5
+BuildRequires: cmake >= 3.1.0
+BuildRequires: bzip2 >= 1.0.6
+BuildRequires: zlib >= 1.2.7
+
+%description
+A highly reliable, highly available and ultra-large scale distributed storage system.
+
+%prep
+%setup -q -n %{name}-%{version}-%{release}
+
+%build
+./build.sh --module=blobstore
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_bindir}/%{name}
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}
+mkdir -p %{buildroot}%{_localstatedir}/run/%{name}
+mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
+mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}
+mkdir -p %{buildroot}%{_docdir}/%{name}-%{version}-%{release}
+
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/build/bin/blobstore/access %{buildroot}%{_bindir}/
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/build/bin/blobstore/blobnode %{buildroot}%{_bindir}/
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/build/bin/blobstore/blobstore-cli %{buildroot}%{_bindir}/
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/build/bin/blobstore/clustermgr %{buildroot}%{_bindir}/
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/build/bin/blobstore/proxy %{buildroot}%{_bindir}/
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/build/bin/blobstore/scheduler %{buildroot}%{_bindir}/
+
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/check_env.sh %{buildroot}%{_bindir}/%{name}
+install -m 0755 %{_builddir}/%{name}-%{version}-%{release}/vstart_blobstore.sh %{buildroot}%{_bindir}/%{name}
+
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/clustermgr/clustermgr.conf %{buildroot}%{_bindir}/%{name}/sample.clustermgr.conf
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/clustermgr/clustermgr1.conf %{buildroot}%{_bindir}/%{name}/sample.clustermgr1.conf
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/clustermgr/clustermgr2.conf %{buildroot}%{_bindir}/%{name}/sample.clustermgr2.conf
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/clustermgr/clustermgr3.conf %{buildroot}%{_bindir}/%{name}/sample.clustermgr3.conf
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/proxy/proxy.conf %{buildroot}%{_bindir}/%{name}/sample.proxy.conf
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/scheduler/scheduler.conf %{buildroot}%{_bindir}/%{name}/sample.scheduler.conf
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/blobnode/blobnode.conf %{buildroot}%{_bindir}/%{name}/sample.blobnode.conf
+install -m 0644 %{_builddir}/%{name}-%{version}-%{release}/blobstore/cmd/access/access.conf %{buildroot}%{_bindir}/%{name}/sample.access.conf
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-,nobody,nobody)
+%{_bindir}/access
+%{_bindir}/blobnode
+%{_bindir}/blobstore-cli
+%{_bindir}/clustermgr
+%{_bindir}/proxy
+%{_bindir}/scheduler
+%{_bindir}/%{name}/check_env.sh
+%{_bindir}/%{name}/vstart_blobstore.sh
+%{_bindir}/%{name}/sample.clustermgr.conf
+%{_bindir}/%{name}/sample.clustermgr1.conf
+%{_bindir}/%{name}/sample.clustermgr2.conf
+%{_bindir}/%{name}/sample.clustermgr3.conf
+%{_bindir}/%{name}/sample.proxy.conf
+%{_bindir}/%{name}/sample.scheduler.conf
+%{_bindir}/%{name}/sample.blobnode.conf
+%{_bindir}/%{name}/sample.access.conf
+%dir %{_sysconfdir}/%{name}
+%dir %{_localstatedir}/run/%{name}
+%dir %{_localstatedir}/log/%{name}
+%dir %{_localstatedir}/lib/%{name}
+%dir %{_docdir}/%{name}-%{version}-%{release}
+%defattr(-,nobody,nobody)
