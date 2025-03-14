@@ -55,8 +55,8 @@ get_rocksdb_compress_dep() {
     cd "${root_path}/vendor/dep"
 
     if [ ! -d "${root_path}/vendor/dep/zlib-1.2.11" ]; then
-        if [ -n "$OFFLINE_BUILD" ];then
-            cp "$OFFLINE_BUILD/zlib-1.2.11.tar.gz" ./
+        if [ -n "$offline_build" ];then
+            cp "$offline_build/zlib-1.2.11.tar.gz" ./
         else
             wget https://zlib.net/fossils/zlib-1.2.11.tar.gz
         fi
@@ -64,8 +64,8 @@ get_rocksdb_compress_dep() {
     fi
 
     if [ ! -d "${root_path}/vendor/dep/bzip2-1.0.6" ]; then
-        if [ -n "$OFFLINE_BUILD" ];then
-            cp "$OFFLINE_BUILD/bzip2-1.0.6.tar.gz" ./
+        if [ -n "$offline_build" ];then
+            cp "$offline_build/bzip2-1.0.6.tar.gz" ./
         else
             wget https://repository.timesys.com/buildsources/b/bzip2/bzip2-1.0.6/bzip2-1.0.6.tar.gz
         fi
@@ -73,8 +73,8 @@ get_rocksdb_compress_dep() {
     fi
 
     if [ ! -d "${root_path}/vendor/dep/zstd-1.4.8" ]; then
-        if [ -n "$OFFLINE_BUILD" ];then
-            cp "$OFFLINE_BUILD/zstd-v1.4.8.zip" ./
+        if [ -n "$offline_build" ];then
+            cp "$offline_build/zstd-v1.4.8.zip" ./
         else
             wget -O zstd-v1.4.8.zip https://codeload.github.com/facebook/zstd/zip/v1.4.8
         fi
@@ -82,8 +82,8 @@ get_rocksdb_compress_dep() {
     fi
 
     if [ ! -d "${root_path}/vendor/dep/lz4-1.9.3" ]; then
-        if [ -n "$OFFLINE_BUILD" ];then
-            cp "$OFFLINE_BUILD/lz4-v1.9.3.tar.gz" ./
+        if [ -n "$offline_build" ];then
+            cp "$offline_build/lz4-v1.9.3.tar.gz" ./
         else
             wget -O lz4-v1.9.3.tar.gz https://codeload.github.com/lz4/lz4/tar.gz/v1.9.3
         fi
@@ -131,8 +131,9 @@ cpu_arch=$(get_cpu_architecture)
 gcc_version=$(get_gcc_version)
 module="all"
 rpm_target=""
+offline_build=""
 
-if ! GETOPT_ARGS=$(getopt -q -o r:m: --long rpm:module: -- "$@");then
+if ! GETOPT_ARGS=$(getopt -q -o r:m:o: --long rpm:module:offline_build: -- "$@");then
     echo_error "Error: Invalid option."
 fi
 eval set -- "$GETOPT_ARGS"
@@ -148,6 +149,11 @@ while [ -n "$1" ]; do
         -m|--module)
             [ -z "$2" ] && echo_error "Error: -m requires a value."
             module="$2"
+            shift 2
+            ;;
+        -o|--offline_build)
+            [ -z "$2" ] && echo_error "Error: -m requires a value."
+            offline_build="$2"
             shift 2
             ;;
         --)

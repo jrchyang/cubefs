@@ -27,7 +27,7 @@ A highly reliable, highly available and ultra-large scale distributed storage sy
 %setup -q -n %{name}-%{version}-%{release}
 
 %build
-./build.sh --module=blobstore
+./build.sh --module=blobstore --offline_build=/home/cubefs-deps
 
 %install
 rm -rf %{buildroot}
