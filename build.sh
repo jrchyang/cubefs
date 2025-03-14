@@ -100,17 +100,17 @@ copy_config() {
         mkdir -p "$root_path"/build/config
     fi
 
-    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr.conf "${root_path}"/build/conf/clustermgr.conf
-    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr1.conf "${root_path}"/build/conf/clustermgr1.conf
-    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr2.conf "${root_path}"/build/conf/clustermgr2.conf
-    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr3.conf "${root_path}"/build/conf/clustermgr3.conf
-    cp -f "$root_path"/blobstore/cmd/proxy/proxy.conf "${root_path}"/build/conf/proxy.conf
-    cp -f "$root_path"/blobstore/cmd/scheduler/scheduler.conf "${root_path}"/build/conf/scheduler.conf
-    cp -f "$root_path"/blobstore/cmd/scheduler/scheduler.leader.conf "${root_path}"/build/conf/scheduler.leader.conf
-    cp -f "$root_path"/blobstore/cmd/scheduler/scheduler.follower.conf "${root_path}"/build/conf/scheduler.follower.conf
-    cp -f "$root_path"/blobstore/cmd/blobnode/blobnode.conf "${root_path}"/build/conf/blobnode.conf
-    cp -f "$root_path"/blobstore/cmd/access/access.conf "${root_path}"/build/conf/access.conf
-    cp -f "$root_path"/blobstore/cli/cli/cli.conf "${root_path}"/build/conf/blobstore.cli.conf
+    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr.conf "${root_path}"/build/config/clustermgr.conf
+    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr1.conf "${root_path}"/build/config/clustermgr1.conf
+    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr2.conf "${root_path}"/build/config/clustermgr2.conf
+    cp -f "$root_path"/blobstore/cmd/clustermgr/clustermgr3.conf "${root_path}"/build/config/clustermgr3.conf
+    cp -f "$root_path"/blobstore/cmd/proxy/proxy.conf "${root_path}"/build/config/proxy.conf
+    cp -f "$root_path"/blobstore/cmd/scheduler/scheduler.conf "${root_path}"/build/config/scheduler.conf
+    cp -f "$root_path"/blobstore/cmd/scheduler/scheduler.leader.conf "${root_path}"/build/config/scheduler.leader.conf
+    cp -f "$root_path"/blobstore/cmd/scheduler/scheduler.follower.conf "${root_path}"/build/config/scheduler.follower.conf
+    cp -f "$root_path"/blobstore/cmd/blobnode/blobnode.conf "${root_path}"/build/config/blobnode.conf
+    cp -f "$root_path"/blobstore/cmd/access/access.conf "${root_path}"/build/config/access.conf
+    cp -f "$root_path"/blobstore/cli/cli/cli.conf "${root_path}"/build/config/blobstore.cli.conf
 }
 
 # build rpm blobstore
