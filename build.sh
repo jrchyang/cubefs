@@ -122,7 +122,7 @@ build_rpm_blobstore() {
     rpm_rversion=$(git log -n1 --format=%h)
     rpm_dirname=$(basename "$root_path")
     rpm_name="blobstore"
-    rpm_target="$rpm_name-$rpm_version-$rpm_rversion"
+    rpm_target="$rpm_name-$rpm_version"
 
     # 生成 rpm 编译使用的代码
     cp -rp ../"$rpm_dirname" ~/rpmbuild/SOURCES/"$rpm_target"
@@ -131,7 +131,7 @@ build_rpm_blobstore() {
     sed -e "s,@name@,${rpm_name},g" \
         -e "s,@version@,${rpm_version},g" \
         -e "s,@revision@,${rpm_rversion},g" \
-        "$root_path"/blobstore.spec.in > ~/rpmbuild/SPECS/${rpm_name}.spec
+        "$root_path"/blobstore/blobstore.spec.in > ~/rpmbuild/SPECS/${rpm_name}.spec
 
     # 构建 RPM 包
     rpmbuild -bb --clean ~/rpmbuild/SPECS/${rpm_name}.spec
