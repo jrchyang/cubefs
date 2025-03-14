@@ -2,7 +2,8 @@
 
 set -e
 
-root_path=$(readlink -f "$0")
+script_path=$(readlink -f "$0")
+root_path=$(dirname "$script_path")
 source "$root_path/check_env.sh"
 
 echo_error() {
@@ -133,7 +134,7 @@ module="all"
 rpm_target=""
 offline_build=""
 
-if ! GETOPT_ARGS=$(getopt -q -o r:m:o: --long rpm:module:offline_build: -- "$@");then
+if ! GETOPT_ARGS=$(getopt -q -o r:m:o: --long rpm:,module:,offline_build: -- "$@");then
     echo_error "Error: Invalid option."
 fi
 eval set -- "$GETOPT_ARGS"
@@ -144,7 +145,7 @@ while [ -n "$1" ]; do
         -r|--rpm)
             [ -z "$2" ] && echo_error "Error: -m requires a value."
             rpm_target="$2"
-            shift
+            shift 2
             ;;
         -m|--module)
             [ -z "$2" ] && echo_error "Error: -m requires a value."
@@ -167,23 +168,23 @@ while [ -n "$1" ]; do
     esac
 done
 
-case "$cpu_arch" in
-    "x86")
-        build_linux_x86_64
-        ;;
-    "arm")
-        if [ $((gcc_version + 0)) -ge 9 ];then
-            build_linux_arm64_gcc9
-        else
-            build_linux_arm64_gcc4
-        fi
-        ;;
-    "unknown")
-        echo "unknown cpu architecture"
-        exit 1
-        ;;
-esac
-
 if [ -n "$rpm_target" ];then
     build_rpm
+else
+    case "$cpu_arch" in
+        "x86")
+            build_linux_x86_64
+            ;;
+        "arm")
+            if [ $((gcc_version + 0)) -ge 9 ];then
+                build_linux_arm64_gcc9
+            else
+                build_linux_arm64_gcc4
+            fi
+            ;;
+        "unknown")
+            echo "unknown cpu architecture"
+            exit 1
+            ;;
+    esac
 fi
