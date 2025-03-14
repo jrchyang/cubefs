@@ -90,11 +90,11 @@ if [ ${num} -le 1 ];then
 fi
 
 # Start the clustermgr
-nohup /usr/bin/blobstore/clustermgr -f /usr/bin/blobstore/clustermgr1.conf >> /var/log/blobstore/clustermgr1.log  2>&1 &
-nohup /usr/bin/blobstore/clustermgr -f /usr/bin/blobstore/clustermgr2.conf >> /var/log/blobstore/clustermgr2.log  2>&1 &
-nohup /usr/bin/blobstore/clustermgr -f /usr/bin/blobstore/clustermgr3.conf >> /var/log/blobstore/clustermgr3.log  2>&1 &
+nohup /usr/bin/clustermgr -f /usr/bin/blobstore/clustermgr1.conf >> /var/log/blobstore/clustermgr1.log  2>&1 &
+nohup /usr/bin/clustermgr -f /usr/bin/blobstore/clustermgr2.conf >> /var/log/blobstore/clustermgr2.log  2>&1 &
+nohup /usr/bin/clustermgr -f /usr/bin/blobstore/clustermgr3.conf >> /var/log/blobstore/clustermgr3.log  2>&1 &
 sleep 5
-num=$(ps -ef | egrep /usr/bin/blobstore/clustermgr |  egrep -v "vi|tail|grep" | wc -l)
+num=$(ps -ef | egrep /usr/bin/clustermgr |  egrep -v "vi|tail|grep" | wc -l)
 if [ $num -ne 3 ]; then
     echo "Failed to start clustermgr"
     exit 1
@@ -104,9 +104,9 @@ sleep 15
 echo "start clustermgr ok"
 
 # Start the proxy
-nohup /usr/bin/blobstore/proxy -f /usr/bin/blobstore/proxy.conf >> /var/log/blobstore/logs/proxy.log 2>&1 &
+nohup /usr/bin/proxy -f /usr/bin/blobstore/proxy.conf >> /var/log/blobstore/logs/proxy.log 2>&1 &
 sleep 1
-num=$(ps -ef | egrep /usr/bin/blobstore/proxy |  egrep -v "vi|tail|grep" | wc -l)
+num=$(ps -ef | egrep /usr/bin/proxy |  egrep -v "vi|tail|grep" | wc -l)
 if [ ${num} -lt 1 ];then
     echo "The proxy start failed."
     exit 1
@@ -114,9 +114,9 @@ fi
 echo "start proxy ok"
 
 # Start the scheduler
-nohup /usr/bin/blobstore/scheduler -f /usr/bin/blobstore/scheduler.conf >> /var/log/blobstore/scheduler.log 2>&1 &
+nohup /usr/bin/scheduler -f /usr/bin/blobstore/scheduler.conf >> /var/log/blobstore/scheduler.log 2>&1 &
 sleep 1
-num=$(ps -ef | egrep /usr/bin/blobstore/scheduler |  egrep -v "vi|tail|grep" | wc -l)
+num=$(ps -ef | egrep /usr/bin/scheduler |  egrep -v "vi|tail|grep" | wc -l)
 if [ ${num} -lt 1 ];then
     echo "The scheduler start failed."
     exit 1
@@ -125,9 +125,9 @@ echo "start scheduler ok"
 
 mkdir -p /var/run/blobstore/disks/disk{1..8}
 # Start the blobnode
-nohup /usr/bin/blobstore/blobnode -f /usr/bin/blobstore/blobnode.conf >> /var/log/blobstore/blobnode.log 2>&1 &
+nohup /usr/bin/blobnode -f /usr/bin/blobstore/blobnode.conf >> /var/log/blobstore/blobnode.log 2>&1 &
 sleep 1
-num=$(ps -ef | egrep /usr/bin/blobstore/blobnode |  egrep -v "vi|tail|grep" | wc -l)
+num=$(ps -ef | egrep /usr/bin/blobnode |  egrep -v "vi|tail|grep" | wc -l)
 if [ ${num} -lt 1 ];then
     echo "The blobnode start failed."
     exit 1
@@ -140,9 +140,9 @@ if [ "${consul}" == "--consul" ]; then
 fi
 
 # Start the access
-nohup /usr/bin/blobstore/access -f /usr/bin/blobstore/access.conf >> /var/log/blobstore/access.log 2>&1 &
+nohup /usr/bin/access -f /usr/bin/blobstore/access.conf >> /var/log/blobstore/access.log 2>&1 &
 sleep 1
-num=$(ps -ef | egrep /usr/bin/blobstore/access |  egrep -v "vi|tail|grep" | wc -l)
+num=$(ps -ef | egrep /usr/bin/access |  egrep -v "vi|tail|grep" | wc -l)
 if [ ${num} -lt 1 ];then
     echo "The access start failed."
     exit 1
