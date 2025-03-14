@@ -113,7 +113,7 @@ build_rpm_blobstore() {
     sed -e "s,@name@,${rpm_name},g" \
         -e "s,@version@,${rpm_version},g" \
         -e "s,@revision@,${rpm_rversion},g" \
-        "$root_path"/redundancer.spec.in > ~/rpmbuild/SPECS/${rpm_name}.spec
+        "$root_path"/blobstore.spec.in > ~/rpmbuild/SPECS/${rpm_name}.spec
 
     # 构建 RPM 包
     rpmbuild -bb --clean ~/rpmbuild/SPECS/${rpm_name}.spec
