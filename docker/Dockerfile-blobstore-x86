@@ -85,3 +85,9 @@ RUN wget https://go.dev/dl/go1.23.7.linux-amd64.tar.gz    \
   && echo 'export PATH=$PATH:$GOPATH/bin' >> /etc/profile
 
 RUN yum clean all
+
+# build command
+# docker build \
+#   --build-arg "HTTP_PROXY=http://127.0.0.1:7890" \
+#   --build-arg "HTTPS_PROXY=http://127.0.0.1:7890" \
+#   -f ./Dockerfile-blobstore-x86 -t centos8-blobstore:v1 .
