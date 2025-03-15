@@ -1,4 +1,4 @@
-FROM centos:8.4.2105 as build
+FROM centos:8.4.2105
 SHELL ["/bin/bash", "-c"]
 
 RUN mv /etc/yum.repos.d /etc/yum.repos.d.bak
