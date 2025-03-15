@@ -120,6 +120,7 @@ fi
 echo "start scheduler ok"
 
 mkdir -p "$RUN_DIR"/disks/disk{1..8}
+sed -i "s|./run/disks|$RUN_DIR/disks|g" "$CONF_DIR"/blobnode.conf
 # Start the blobnode
 nohup "$BIN_DIR"/blobnode -f "$CONF_DIR"/blobnode.conf >> "$LOG_DIR"/blobnode.log 2>&1 &
 sleep 1
