@@ -1,0 +1,87 @@
+FROM centos:8.4.2105 as build
+SHELL ["/bin/bash", "-c"]
+
+RUN mv /etc/yum.repos.d /etc/yum.repos.d.bak
+RUN mkdir -p /etc/yum.repos.d
+
+# use aliyun yum source
+RUN tee /etc/yum.repos.d/CentOS-Base.repo <<-'EOF'
+# CentOS-Base.repo
+#
+# The mirror system uses the connecting IP address of the client and the
+# update status of each mirror to pick mirrors that are updated to and
+# geographically close to the client.  You should use this for CentOS updates
+# unless you are manually picking other mirrors.
+#
+# If the mirrorlist= does not work for you, as a fall back you can try the 
+# remarked out baseurl= line instead.
+#
+#
+ 
+[base]
+name=CentOS-$releasever - Base - mirrors.aliyun.com
+#failovermethod=priority
+baseurl=http://mirrors.aliyun.com/centos/$releasever/BaseOS/$basearch/os/
+        http://mirrors.aliyuncs.com/centos/$releasever/BaseOS/$basearch/os/
+        http://mirrors.cloud.aliyuncs.com/centos/$releasever/BaseOS/$basearch/os/
+gpgcheck=1
+gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-Official
+ 
+#additional packages that may be useful
+[extras]
+name=CentOS-$releasever - Extras - mirrors.aliyun.com
+#failovermethod=priority
+baseurl=http://mirrors.aliyun.com/centos/$releasever/extras/$basearch/os/
+        http://mirrors.aliyuncs.com/centos/$releasever/extras/$basearch/os/
+        http://mirrors.cloud.aliyuncs.com/centos/$releasever/extras/$basearch/os/
+gpgcheck=1
+gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-Official
+ 
+#additional packages that extend functionality of existing packages
+[centosplus]
+name=CentOS-$releasever - Plus - mirrors.aliyun.com
+#failovermethod=priority
+baseurl=http://mirrors.aliyun.com/centos/$releasever/centosplus/$basearch/os/
+        http://mirrors.aliyuncs.com/centos/$releasever/centosplus/$basearch/os/
+        http://mirrors.cloud.aliyuncs.com/centos/$releasever/centosplus/$basearch/os/
+gpgcheck=1
+enabled=0
+gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-Official
+ 
+[PowerTools]
+name=CentOS-$releasever - PowerTools - mirrors.aliyun.com
+#failovermethod=priority
+baseurl=http://mirrors.aliyun.com/centos/$releasever/PowerTools/$basearch/os/
+        http://mirrors.aliyuncs.com/centos/$releasever/PowerTools/$basearch/os/
+        http://mirrors.cloud.aliyuncs.com/centos/$releasever/PowerTools/$basearch/os/
+gpgcheck=1
+enabled=0
+gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-Official
+
+
+[AppStream]
+name=CentOS-$releasever - AppStream - mirrors.aliyun.com
+#failovermethod=priority
+baseurl=http://mirrors.aliyun.com/centos/$releasever/AppStream/$basearch/os/
+        http://mirrors.aliyuncs.com/centos/$releasever/AppStream/$basearch/os/
+        http://mirrors.cloud.aliyuncs.com/centos/$releasever/AppStream/$basearch/os/
+gpgcheck=1
+gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-Official
+
+EOF
+
+# install deps
+RUN yum clean all && yum makecache
+RUN yum install -y vim git curl wget net-tools gcc gcc-c++ make automake cmake \
+  python3 maven lsof sysstat smartmontools ncurses diffutils unzip \
+  rpm-build rpmdevtools
+
+# install go
+RUN wget https://go.dev/dl/go1.23.7.linux-amd64.tar.gz    \
+  && tar -zxf go1.23.7.linux-amd64.tar.gz -C /usr/local/  \
+  && echo 'export GOROOT=/usr/local/go' >> /etc/profile   \
+  && echo 'export PATH=$PATH:$GOROOT/bin' >> /etc/profile \
+  && echo 'export GOPATH=/opt/go' >> /etc/profile         \
+  && echo 'export PATH=$PATH:$GOPATH/bin' >> /etc/profile
+
+RUN yum clean all
