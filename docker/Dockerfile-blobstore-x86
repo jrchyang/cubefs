@@ -82,6 +82,9 @@ RUN wget https://go.dev/dl/go1.23.7.linux-amd64.tar.gz    \
   && echo 'export GOROOT=/usr/local/go' >> /etc/profile   \
   && echo 'export PATH=$PATH:$GOROOT/bin' >> /etc/profile \
   && echo 'export GOPATH=/opt/go' >> /etc/profile         \
-  && echo 'export PATH=$PATH:$GOPATH/bin' >> /etc/profile
+  && echo 'export PATH=$PATH:$GOPATH/bin' >> /etc/profile \
+  && echo "" >> /root/.bashrc                             \
+  && echo ". /etc/profile" >> /root/.bashrc               \
+  && echo "" >> /root/.bashrc
 
 RUN yum clean all
